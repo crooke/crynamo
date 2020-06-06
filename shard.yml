@@ -1,5 +1,5 @@
 name: crynamo
-version: 0.1.1
+version: 0.2.0
 
 authors:
   -  <timkendall18@gmail.com>
@@ -7,12 +7,12 @@ authors:
 description: |
   Simple DynamoDB client.
 
-crystal: 0.24.1
+crystal: 0.34.0
 
 dependencies:
   awscr-signer:
     github: taylorfinnell/awscr-signer
-    version: ~> 0.4.0
+    version: ~> 0.7.0
 
 development_dependencies:
   webmock:

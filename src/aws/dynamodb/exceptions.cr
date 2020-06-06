@@ -15,4 +15,8 @@ module AWS::DynamoDB::Exceptions
   # Raised when an item collection is too large.
   class ItemCollectionSizeLimitExceededException < Exception
   end
+
+  # This error can occur for several reasons, such as a required parameter that is missing, a value that is out of range, or mismatched data types. The error message contains details about the specific part of the request that caused the error.
+  class ValidationException < Exception
+  end
 end

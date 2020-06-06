@@ -36,9 +36,9 @@ module Crynamo
 
       result = request(AWS::DynamoDB::Operation::GetItem, query)
       # DynamoDB will return us an empty JSON object if nothing exists
-      return {} of String => JSON::Type if !JSON.parse(result).as_h.has_key?("Item")
+      return {} of String => JSON::Any::Type if !JSON.parse(result).as_h.has_key?("Item")
 
-      Crynamo::Marshaller.from_dynamo(JSON.parse(result)["Item"].as_h)
+      Crynamo::Marshaller.from_dynamo(JSON.parse(result)["Item"])
     end
 
     # Inserts an item
@@ -115,10 +115,11 @@ module Crynamo
         "ProvisionedThroughputExceededException",
         "ResourceNotFoundException",
         "ItemCollectionSizeLimitExceededException",
+        "ValidationException",
       ], AWS::DynamoDB::Exceptions
 
       # Finally, raise a generic exception if none of the above match
-      raise Exception.new(error.message)
+      raise Exception.new("#{error.message} (#{error.type})")
     end
 
     private macro define_exception_handlers(exceptions, mmodule)

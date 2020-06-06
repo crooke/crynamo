@@ -6,7 +6,7 @@ module Crynamo
     extend self
 
     alias DynamoDB = AWS::DynamoDB
-    
+
     alias Number = Int8 |
                    Int16 |
                    Int32 |
@@ -48,32 +48,32 @@ module Crynamo
       Hash.zip(keys, dynamodb_values)
     end
 
-    # Converts a DynamoDB `Hash` representation to a regular Crystal `Hash`
+    # Converts a DynamoDB JSON representation to a regular Crystal `Hash`
     # TODO Convert to a `NamedTuple` instead
-    def from_dynamo(item : Hash)
-      keys = item.keys
+    def from_dynamo(item : JSON::Any)
+      keys = item.as_h.keys
 
-      crystal_values = item.values.map do |value|
-        dynamodb_type = value.as(Hash).first_key
-        dynamodb_value = value.as(Hash).first_value
+      crystal_values = item.as_h.values.map do |value|
+        dynamodb_type = value.as_h.first_key
+        dynamodb_value = value.as_h.first_value
 
         case dynamodb_type
         when DynamoDB::TypeDescriptor.string
           dynamodb_value
         when DynamoDB::TypeDescriptor.number
-          dynamodb_value.as(String).to_f32
+          dynamodb_value.as_s.to_f32
         when DynamoDB::TypeDescriptor.bool
-          dynamodb_value.as(Bool)
+          dynamodb_value.as_bool
         when DynamoDB::TypeDescriptor.string_set
           dynamodb_value
-            .as(Array)
-            .map(&.as(String))
+            .as_a
+            .map(&.as_s)
         when DynamoDB::TypeDescriptor.number_set
           dynamodb_value
-            .as(Array)
-            .map(&.as(String).to_f32)
+            .as_a
+            .map(&.as_s.to_f32)
         when DynamoDB::TypeDescriptor.list
-          dynamodb_value.as(Array)
+          dynamodb_value.as_a
         when DynamoDB::TypeDescriptor.map
           # TODO Figure out what we need to do to cast to a generic Hash or NamedTuple
           # dynamodb_value.as(Hash(String, JSON::Type))
@@ -87,7 +87,7 @@ module Crynamo
           raise MarshallException.new "Couldn't marshal DynamoDB type #{typeof(dynamodb_type)} to Crystal type."
         end
       end
-      
+
       Hash.zip(keys, crystal_values)
     end
   end
